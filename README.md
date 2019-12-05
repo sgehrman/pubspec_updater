@@ -6,7 +6,7 @@ Creates a native tool to update all package versions in pubspec.yaml
 $ dart install.dart
 ```
 
-This will move a tool called pubspec_updater in to /home/user/bin. Make sure you have a bin dir in home and it's added to your \$PATH.
+This will copy a tool called pubspec_updater in to /home/user/bin. Make sure you have a bin dir in home and it's added to your \$PATH.
 
 Only tested on Linux, but should work on macOS.
 
