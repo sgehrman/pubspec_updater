@@ -1,11 +1,14 @@
 import 'dart:io';
 
+String name = 'pubspec_updater';
+
 main() async {
   await getPub();
   await removeBuild();
   await makeBuildDir();
   await buildNative();
   await install();
+  await removeBuild();
 }
 
 getPub() async {
@@ -16,16 +19,22 @@ getPub() async {
 }
 
 removeBuild() async {
-  return Process.run('rm', ['-r', './build']).then((ProcessResult results) {
-    stdout.write(results.stdout);
-    stdout.write(results.stderr);
+  Directory buildDir = Directory('./build');
+
+  return buildDir.exists().then((exists) {
+    if (exists) {
+      buildDir.deleteSync(recursive: true);
+    }
   });
 }
 
 makeBuildDir() async {
-  return Process.run('mkdir', ['build']).then((ProcessResult results) {
-    stdout.write(results.stdout);
-    stdout.write(results.stderr);
+  Directory buildDir = Directory('./build');
+
+  return buildDir.exists().then((exists) {
+    if (!exists) {
+      buildDir.createSync(recursive: false);
+    }
   });
 }
 
@@ -35,7 +44,7 @@ buildNative() async {
     '-p',
     './.packages',
     '-o',
-    './build/pubspec_updater'
+    './build/$name'
   ]).then((ProcessResult results) {
     stdout.write(results.stdout);
     stdout.write(results.stderr);
@@ -43,13 +52,8 @@ buildNative() async {
 }
 
 install() async {
-  // didn't see to like the ~/bin
   String home =
       Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
 
-  return Process.run('mv', ['./build/pubspec_updater', '$home/bin'])
-      .then((ProcessResult results) {
-    stdout.write(results.stdout);
-    stdout.write(results.stderr);
-  });
+  return File('./build/$name').copy('$home/bin/$name');
 }
