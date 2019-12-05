@@ -12,7 +12,7 @@ Only tested on Linux, but should work on macOS.
 
 Send in Pull Requests if it doesn't work for you. Let me know if there is a better way to build this.
 
-Once the tool is installed, you can go to any flutter package directory with a .pubspec.yaml file and run:
+Once the tool is installed, you can go to any flutter package directory with a pubspec.yaml file and run:
 
 ```
 $ pubspec_updater
