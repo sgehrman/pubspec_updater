@@ -3,7 +3,7 @@ import 'dart:io';
 String name = 'pubspec_updater';
 
 main() async {
-  await getPub();
+  // await getPub();
   await removeBuild();
   await makeBuildDir();
   await buildNative();
