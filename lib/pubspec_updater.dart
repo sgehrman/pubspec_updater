@@ -169,7 +169,9 @@ class Updater {
   }
 
   String searchString(Dependency dependency, String quote) {
-    String search = '${dependency.name}:';
+    // space added to catch the case of image: and xx_image:
+    // we don't want to match the xx_ version
+    String search = ' ${dependency.name}:';
 
     if (dependency.currentVersion.isNotEmpty) {
       search += ' $quote${dependency.currentVersion}$quote';
@@ -206,7 +208,9 @@ class Updater {
         String search = buildSearchString(yaml, dependency);
 
         if (search != null) {
-          String replace = '${dependency.name}: ${dependency.newVersion}';
+          // space added to catch the case of image: and xx_image:
+          // see searchString above
+          String replace = ' ${dependency.name}: ${dependency.newVersion}';
 
           yaml = yaml.replaceFirst(search, replace);
         } else {
