@@ -7,12 +7,12 @@ import 'package:http/http.dart';
 import 'package:yaml/yaml.dart';
 import 'package:args/args.dart';
 
-Future<void> main(List<String> args) async {
+Future main(List<String> args) async {
   runUpdater(args);
 }
 
-runUpdater(args) {
-  var parser = ArgParser();
+Updater runUpdater(args) {
+  final parser = ArgParser();
 
   parser.addFlag('help',
       abbr: 'h', defaultsTo: false, negatable: false, help: 'Show help');
@@ -44,6 +44,16 @@ runUpdater(args) {
 }
 
 class Updater {
+  Updater(this.parser, ArgResults options)
+      : version = options['version'],
+        carets = options['carets'],
+        nocarets = options['nocarets'],
+        help = options['help'],
+        update = options['update'],
+        removeRanges = options['removeRanges'] {
+    run();
+  }
+
   final bool help;
   final bool version;
   final bool carets;
@@ -52,18 +62,7 @@ class Updater {
   final bool nocarets;
   final ArgParser parser;
 
-  Updater(ArgParser parser, ArgResults options)
-      : this.parser = parser,
-        this.version = options['version'],
-        this.carets = options['carets'],
-        this.nocarets = options['nocarets'],
-        this.help = options['help'],
-        this.update = options['update'],
-        this.removeRanges = options['removeRanges'] {
-    run();
-  }
-
-  run() {
+  void run() {
     if (help) {
       stdout.writeln(parser.usage);
     } else if (version) {
@@ -74,7 +73,7 @@ class Updater {
     }
   }
 
-  writeUpdateInfo(List<Dependency> dependencies) {
+  void writeUpdateInfo(List<Dependency> dependencies) {
     if (dependencies.isNotEmpty) {
       for (int x = 0; x < dependencies.length; x++) {
         if (dependencies[x].hasNewVersion) {
@@ -88,7 +87,7 @@ class Updater {
     stdout.writeln();
   }
 
-  runUpdate() async {
+  Future runUpdate() async {
     final File file = File('./pubspec.yaml');
 
     final List<Dependency> dependencies =
@@ -118,7 +117,7 @@ class Updater {
     final YamlMap dependencies = yaml[section];
 
     if (dependencies != null) {
-      for (MapEntry<dynamic, dynamic> entry in dependencies.entries) {
+      for (final entry in dependencies.entries) {
         // avoid YamlMaps
         if (entry.value is String || entry.value == null) {
           final String name = entry.key.toString();
@@ -203,14 +202,15 @@ class Updater {
   Future<void> updateFile(File file, List<Dependency> list) async {
     String yaml = await file.readAsString();
 
-    for (Dependency dependency in list) {
+    for (final dependency in list) {
       if (dependency.hasNewVersion) {
-        String search = buildSearchString(yaml, dependency);
+        final String search = buildSearchString(yaml, dependency);
 
         if (search != null) {
           // space added to catch the case of image: and xx_image:
           // see searchString above
-          String replace = ' ${dependency.name}: ${dependency.newVersion}';
+          final String replace =
+              ' ${dependency.name}: ${dependency.newVersion}';
 
           yaml = yaml.replaceFirst(search, replace);
         } else {
@@ -227,16 +227,16 @@ class Updater {
 }
 
 class Dependency {
-  final String name;
-  final String currentVersion;
-  String newVersion;
-  bool hadCaret = false;
-
   Dependency(this.name, this.currentVersion) : newVersion = currentVersion {
     if (currentVersion.isNotEmpty && currentVersion.startsWith('^')) {
       hadCaret = true;
     }
   }
+
+  final String name;
+  final String currentVersion;
+  String newVersion;
+  bool hadCaret = false;
 
   bool get hasNewVersion => currentVersion != newVersion;
 
@@ -246,10 +246,10 @@ class Dependency {
 
   @override
   String toString() {
-    String left = '$name: $currentVersion';
-    String right = '$name: $newVersion';
+    final String left = '$name: $currentVersion';
+    final String right = '$name: $newVersion';
 
-    String padding = ' ' * max(2, (20 - left.length));
+    final String padding = ' ' * max(2, 20 - left.length);
 
     return '$left$padding->     $right';
   }
