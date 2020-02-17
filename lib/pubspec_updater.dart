@@ -96,7 +96,11 @@ class Updater {
     final List<Dependency> devDependencies =
         await getDependencies(file, 'dev_dependencies');
 
+    final List<Dependency> overrideDependencies =
+        await getDependencies(file, 'dependency_overrides');
+
     dependencies.addAll(devDependencies);
+    dependencies.addAll(overrideDependencies);
 
     await updateDependencies(dependencies);
 
