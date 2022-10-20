@@ -164,8 +164,8 @@ class Updater {
   }
 
   Future<String> getLatestVersion(String name) async {
-    final Response response =
-        await get('https://pub.dartlang.org/api/packages/$name');
+    final url = Uri.https('pub.dartlang.org', '/api/packages/$name');
+    final Response response = await get(url);
     final dynamic json = jsonDecode(response.body);
 
     return json['latest']['version'];
