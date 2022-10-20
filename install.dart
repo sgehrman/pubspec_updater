@@ -37,10 +37,10 @@ Future makeBuildDir() async {
 }
 
 Future buildNative() async {
-  return Process.run('dart2native', [
+    return Process.run('dart', [
+    'compile',
+    'exe',
     './lib/pubspec_updater.dart',
-    '-p',
-    './.packages',
     '-o',
     './build/$name'
   ]).then((ProcessResult results) {
@@ -51,7 +51,7 @@ Future buildNative() async {
 
 Future install() async {
   final String home =
-      Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
+      Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'] ?? '';
 
   return File('./build/$name').copy('$home/bin/$name');
 }
